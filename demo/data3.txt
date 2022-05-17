@@ -1,0 +1,4 @@
+Ekaterinsburg;Izhevsk;1;1
+Izhevsk;Tomsk;1;1
+Tomsk;Vladivostok;1;1
+Vladivostok;Ekaterinsburg;1;N/A
