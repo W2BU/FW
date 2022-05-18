@@ -6,6 +6,6 @@ int main() {
     std::cout << myNet.cities();
     std::cout << "Cost of flight from Saint-Petersburg to Khabarovsk\n";
     std::cout << myNet.flightCost(0, 2);
-    std::cout << "\nCost of flight from Ekaterinsburg to Yaroslavl\n";
-    std::cout << myNet.flightCost("Ekaterinsburg", "Yaroslavl");
+    std::cout << "\nCost of flight from Vladivostok to Moscow\n";
+    std::cout << myNet.flightCost("Vladivostok", "Moscow");
 }
