@@ -1,7 +1,7 @@
 #include <TransportNet.cpp>
 
 int main() {
-    TransportNet myNet("data2.txt");
+    TransportNet myNet("data.txt");
     std::cout << "List of found cities:\n";
     std::cout << myNet.cities();
     std::cout << "Cost of flight from Saint-Petersburg to Khabarovsk\n";

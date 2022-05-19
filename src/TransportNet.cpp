@@ -93,10 +93,10 @@ void TransportNet::loadFromFile(const std::string& filename)
     flightData.close();
 
     //  filling empty cells with inf
-    for (int i = 0; i < mapSize; i++) {
-        for (int j = 0; j < mapSize; j++) {
-            if (adjacencyMatrix(i, j) == 0 && i != j)
-                adjacencyMatrix(i, j) = std::numeric_limits<double>::infinity();
+    for (int row = 0; row < mapSize; row++) {
+        for (int column = 0; column < mapSize; column++) {
+            if (adjacencyMatrix(row, column) == 0 && row != column)
+                adjacencyMatrix(row, column) = std::numeric_limits<double>::infinity();
         }
     }
 
@@ -134,14 +134,14 @@ int TransportNet::parseForSize(const std::string& filename)
 
 void TransportNet::solveFloydWarshall()
 {
-    for (int k = 0; k < mapSize; k++)
-        for (int i = 0; i < mapSize; i++)
-            for (int j = 0; j < mapSize; j++)
-                if (adjacencyMatrix(i, k) < std::numeric_limits<double>::infinity() &&
-                    adjacencyMatrix(k, j) < std::numeric_limits<double>::infinity()) {
-                    if (adjacencyMatrix(i, j) > (adjacencyMatrix(i, k) + adjacencyMatrix(k, j))) {
-                        adjacencyMatrix(i, j) = adjacencyMatrix(i, k) + adjacencyMatrix(k, j);
-                        solution(i, j) = k;
+    for (int cross = 0; cross < mapSize; cross++)
+        for (int row = 0; row < mapSize; row++)
+            for (int column = 0; column < mapSize; column++)
+                if (adjacencyMatrix(row, cross) < std::numeric_limits<double>::infinity() &&
+                    adjacencyMatrix(cross, column) < std::numeric_limits<double>::infinity()) {
+                    if (adjacencyMatrix(row, column) > (adjacencyMatrix(row, cross) + adjacencyMatrix(cross, column))) {
+                        adjacencyMatrix(row, column) = adjacencyMatrix(row, cross) + adjacencyMatrix(cross, column);
+                        solution(row, column) = cross;
                     }
                 }
 
@@ -150,8 +150,8 @@ void TransportNet::solveFloydWarshall()
 std::string TransportNet::cities()
 {
     std::stringstream result;
-    for (int i = 0; i < mapSize; i++) {
-        result << i << ". " << citiesList[i] << "\n";
+    for (int cityIndex = 0; cityIndex < mapSize; cityIndex++) {
+        result << cityIndex << ". " << citiesList[cityIndex] << "\n";
     }
     return result.str();
 }

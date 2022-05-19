@@ -1,2 +1,2 @@
-# RBT
-    Map based on red-black binary tree
+# Floyd Warshall
+    Floyd Warshall algorythm implementation on a class that calculates the cheapest flight between two cities
