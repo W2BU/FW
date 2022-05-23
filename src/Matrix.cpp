@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <stdexcept>
+
+//
 class Matrix
 {
     public:
@@ -11,7 +13,7 @@ class Matrix
         Matrix(const Matrix&);
         Matrix& operator=(const Matrix&);
 
-        inline double& operator()(int x, int y) { return matrix[x][y]; }
+        inline double& operator()(int x, int y) { return p[x][y]; }
 
         static Matrix createIdentity(int);
 
@@ -27,7 +29,7 @@ class Matrix
 
     private:
         int rows_, cols_;
-        double **matrix;
+        double **p;
 
         void allocSpace();
         Matrix expHelper(const Matrix&, int);
@@ -52,17 +54,17 @@ Matrix::Matrix(int rows, int cols) : rows_(rows), cols_(cols)
     allocSpace();
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] = 0;
+            p[i][j] = 0;
         }
     }
 }
 
-Matrix::Matrix(double** otherUnit, int rows, int cols) : rows_(rows), cols_(cols)
+Matrix::Matrix(double** a, int rows, int cols) : rows_(rows), cols_(cols)
 {
     allocSpace();
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] = otherUnit[i][j];
+            p[i][j] = a[i][j];
         }
     }
 }
@@ -70,109 +72,109 @@ Matrix::Matrix(double** otherUnit, int rows, int cols) : rows_(rows), cols_(cols
 Matrix::Matrix() : rows_(1), cols_(1)
 {
     allocSpace();
-    matrix[0][0] = 0;
+    p[0][0] = 0;
 }
 
 Matrix::~Matrix()
 {
     for (int i = 0; i < rows_; ++i) {
-        delete[] matrix[i];
+        delete[] p[i];
     }
-    delete[] matrix;
+    delete[] p;
 }
 
-Matrix::Matrix(const Matrix& matrix) : rows_(matrix.rows_), cols_(matrix.cols_)
+Matrix::Matrix(const Matrix& m) : rows_(m.rows_), cols_(m.cols_)
 {
     allocSpace();
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] = matrix.matrix[i][j];
+            p[i][j] = m.p[i][j];
         }
     }
 }
 
-Matrix& Matrix::operator=(const Matrix& matrix)
+Matrix& Matrix::operator=(const Matrix& m)
 {
-    if (this == &matrix) {
+    if (this == &m) {
         return *this;
     }
 
-    if (rows_ != matrix.rows_ || cols_ != matrix.cols_) {
+    if (rows_ != m.rows_ || cols_ != m.cols_) {
         for (int i = 0; i < rows_; ++i) {
-            delete[] matrix[i];
+            delete[] p[i];
         }
-        delete[] matrix;
+        delete[] p;
 
-        rows_ = matrix.rows_;
-        cols_ = matrix.cols_;
+        rows_ = m.rows_;
+        cols_ = m.cols_;
         allocSpace();
     }
 
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] = matrix.matrix[i][j];
+            p[i][j] = m.p[i][j];
         }
     }
     return *this;
 }
 
-Matrix& Matrix::operator+=(const Matrix& matrix)
+Matrix& Matrix::operator+=(const Matrix& m)
 {
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] += matrix.matrix[i][j];
+            p[i][j] += m.p[i][j];
         }
     }
     return *this;
 }
 
-Matrix& Matrix::operator-=(const Matrix& matrix)
+Matrix& Matrix::operator-=(const Matrix& m)
 {
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] -= matrix.matrix[i][j];
+            p[i][j] -= m.p[i][j];
         }
     }
     return *this;
 }
 
-Matrix& Matrix::operator*=(const Matrix& matrix)
+Matrix& Matrix::operator*=(const Matrix& m)
 {
-    Matrix temp(rows_, matrix.cols_);
+    Matrix temp(rows_, m.cols_);
     for (int i = 0; i < temp.rows_; ++i) {
         for (int j = 0; j < temp.cols_; ++j) {
             for (int k = 0; k < cols_; ++k) {
-                temp.matrix[i][j] += (matrix[i][k] * matrix.matrix[k][j]);
+                temp.p[i][j] += (p[i][k] * m.p[k][j]);
             }
         }
     }
     return (*this = temp);
 }
 
-Matrix& Matrix::operator*=(double number)
+Matrix& Matrix::operator*=(double num)
 {
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] *= number;
+            p[i][j] *= num;
         }
     }
     return *this;
 }
 
-Matrix& Matrix::operator/=(double number)
+Matrix& Matrix::operator/=(double num)
 {
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            matrix[i][j] /= number;
+            p[i][j] /= num;
         }
     }
     return *this;
 }
 
-Matrix Matrix::operator^(int number)
+Matrix Matrix::operator^(int num)
 {
     Matrix temp(*this);
-    return expHelper(temp, number);
+    return expHelper(temp, num);
 }
 
 Matrix Matrix::createIdentity(int size)
@@ -181,9 +183,9 @@ Matrix Matrix::createIdentity(int size)
     for (int i = 0; i < temp.rows_; ++i) {
         for (int j = 0; j < temp.cols_; ++j) {
             if (i == j) {
-                temp.matrix[i][j] = 1;
+                temp.p[i][j] = 1;
             } else {
-                temp.matrix[i][j] = 0;
+                temp.p[i][j] = 0;
             }
         }
     }
@@ -195,22 +197,22 @@ Matrix Matrix::createIdentity(int size)
 
 void Matrix::allocSpace()
 {
-    matrix = new double*[rows_];
+    p = new double*[rows_];
     for (int i = 0; i < rows_; ++i) {
-        matrix[i] = new double[cols_];
+        p[i] = new double[cols_];
     }
 }
 
-Matrix Matrix::expHelper(const Matrix& matrix, int number)
+Matrix Matrix::expHelper(const Matrix& m, int num)
 {
-    if (number == 0) { 
-        return createIdentity(matrix.rows_);
-    } else if (number == 1) {
-        return matrix;
-    } else if (number % 2 == 0) {  // number is even
-        return expHelper(matrix * matrix, number/2);
-    } else {                    // number is odd
-        return matrix * expHelper(matrix * matrix, (number-1)/2);
+    if (num == 0) { 
+        return createIdentity(m.rows_);
+    } else if (num == 1) {
+        return m;
+    } else if (num % 2 == 0) {  // num is even
+        return expHelper(m * m, num/2);
+    } else {                    // num is odd
+        return m * expHelper(m * m, (num-1)/2);
     }
 }
 
@@ -235,40 +237,40 @@ Matrix operator*(const Matrix& m1, const Matrix& m2)
     return (temp *= m2);
 }
 
-Matrix operator*(const Matrix& matrix, double number)
+Matrix operator*(const Matrix& m, double num)
 {
-    Matrix temp(matrix);
-    return (temp *= number);
+    Matrix temp(m);
+    return (temp *= num);
 }
 
-Matrix operator*(double number, const Matrix& matrix)
+Matrix operator*(double num, const Matrix& m)
 {
-    return (matrix * number);
+    return (m * num);
 }
 
-Matrix operator/(const Matrix& matrix, double number)
+Matrix operator/(const Matrix& m, double num)
 {
-    Matrix temp(matrix);
-    return (temp /= number);
+    Matrix temp(m);
+    return (temp /= num);
 }
 
-ostream& operator<<(ostream& os, const Matrix& matrix)
+ostream& operator<<(ostream& os, const Matrix& m)
 {
-    for (int i = 0; i < matrix.rows_; ++i) {
-        os << matrix.matrix[i][0];
-        for (int j = 1; j < matrix.cols_; ++j) {
-            os << " " << matrix.matrix[i][j];
+    for (int i = 0; i < m.rows_; ++i) {
+        os << m.p[i][0];
+        for (int j = 1; j < m.cols_; ++j) {
+            os << " " << m.p[i][j];
         }
         os << endl;
     }
     return os;
 }
 
-istream& operator>>(istream& is, Matrix& matrix)
+istream& operator>>(istream& is, Matrix& m)
 {
-    for (int i = 0; i < matrix.rows_; ++i) {
-        for (int j = 0; j < matrix.cols_; ++j) {
-            is >> matrix.matrix[i][j];
+    for (int i = 0; i < m.rows_; ++i) {
+        for (int j = 0; j < m.cols_; ++j) {
+            is >> m.p[i][j];
         }
     }
     return is;
