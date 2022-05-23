@@ -134,7 +134,7 @@ int TransportNet::parseForSize(const std::string& filename)
 
 void TransportNet::solveFloydWarshall()
 {
-    for (int cross = 0; cross < mapSize; cross++)
+    for (int cross = 0; cross < mapSize; cross++) // cross - Floyd Warshall iteration
         for (int row = 0; row < mapSize; row++)
             for (int column = 0; column < mapSize; column++)
                 if (adjacencyMatrix(row, cross) < std::numeric_limits<double>::infinity() &&
